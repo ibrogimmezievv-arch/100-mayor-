@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Мэр: 100 дней</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Achievement Toast -->
+  <div class="achievement-toast" id="achievementToast">
+    <span>🏆</span>
+    <span id="achievementText">Достижение!</span>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <div class="notification-title" id="notificationTitle"></div>
+    <div class="notification-text" id="notificationText"></div>
+  </div>
+
+  <!-- Tooltip -->
+  <div class="tooltip" id="tooltip"></div>
+
+  <!-- ===== MAIN MENU ===== -->
+  <div class="screen active" id="mainMenu">
+    <div class="stars" id="stars"></div>
+    <div class="moon"></div>
+    <div class="city-bg" id="cityBg"></div>
+
+    <div class="menu-content">
+      <h1 class="game-title">🏙️ МЭР: 100 ДНЕЙ</h1>
+      <p class="game-subtitle">Построй город. Принимай решения. Стань лучшим мэром.</p>
+
+      <div class="menu-buttons">
+        <button class="btn btn-primary btn-large" id="btnContinue" onclick="game.continueGame()">
+          <span>▶️</span> Продолжить
+        </button>
+        <button class="btn btn-primary btn-large" onclick="game.newGameConfirm()">
+          <span>🆕</span> Новая игра
+        </button>
+        <button class="btn btn-secondary" onclick="ui.showSettings()">
+          <span>⚙️</span> Настройки
+        </button>
+        <button class="btn btn-secondary" onclick="ui.showHowToPlay()">
+          <span>📖</span> Как играть
+        </button>
+        <button class="btn btn-secondary" onclick="ui.exitGame()">
+          <span>🚪</span> Выход
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCREEN ===== -->
+  <div class="screen" id="gameScreen">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="game-logo">🏙️ Мэр: 100 дней</div>
+        <div class="day-badge" id="dayBadge">📅 День 1/100</div>
+      </div>
+      <button class="pause-btn" onclick="ui.showPause()">⏸️</button>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value" id="statMoney">50K</div>
+        <div class="stat-label">Бюджет</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-value" id="statPop">5K</div>
+        <div class="stat-label">Население</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">😊</div>
+        <div class="stat-value" id="statHappy">75%</div>
+        <div class="stat-label">Счастье</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value" id="statPower">100%</div>
+        <div class="stat-label">Электро</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💧</div>
+        <div class="stat-value" id="statWater">100%</div>
+        <div class="stat-label">Вода</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">❤️</div>
+        <div class="stat-value" id="statHealth">80%</div>
+        <div class="stat-label">Здоровье</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🛡️</div>
+        <div class="stat-value" id="statSafety">70%</div>
+        <div class="stat-label">Безопасность</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏗️</div>
+        <div class="stat-value" id="statBuildings">0</div>
+        <div class="stat-label">Здания</div>
+      </div>
+    </div>
+
+    <div class="map-area" id="mapArea">
+      <div class="city-grid" id="cityGrid"></div>
+    </div>
+
+    <div class="action-bar">
+      <button class="action-btn" id="btnBuild" onclick="ui.toggleBuildPanel()">
+        <span>🏗️</span> Строительство
+      </button>
+      <button class="action-btn" onclick="game.nextDay()">
+        <span>▶️</span> Продолжить день
+      </button>
+      <button class="action-btn" onclick="game.saveGame()">
+        <span>💾</span> Сохранить
+      </button>
+    </div>
+  </div>
+
+  <!-- Build Panel -->
+  <div class="build-panel" id="buildPanel">
+    <div class="build-panel-header">
+      <div class="build-panel-title">🏗️ Строительство</div>
+      <button class="build-panel-close" onclick="ui.closeBuildPanel()">✕</button>
+    </div>
+    <div class="buildings-grid" id="buildingsGrid"></div>
+  </div>
+
+  <!-- Day Transition -->
+  <div class="day-transition" id="dayTransition">
+    <div class="day-transition-old" id="transitionOld"></div>
+    <div class="day-transition-arrow">↓</div>
+    <div class="day-transition-new" id="transitionNew"></div>
+  </div>
+
+  <!-- ===== OVERLAYS ===== -->
+
+  <!-- Confirm New Game -->
+  <div class="overlay" id="confirmNewGame">
+    <div class="overlay-content">
+      <div class="overlay-title">🆕 Новая игра?</div>
+      <div class="overlay-text">Старый прогресс будет удалён и заменён новым. Это действие нельзя отменить.</div>
+      <div class="overlay-buttons">
+        <button class="btn btn-danger" onclick="game.startNewGame()">Начать новую игру</button>
+        <button class="btn btn-secondary" onclick="ui.hideOverlay('confirmNewGame')">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="overlay" id="settingsOverlay">
+    <div class="overlay-content">
+      <div class="overlay-title">⚙️ Настройки</div>
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="setting-label"><span>🔊</span> Звуки</div>
+          <div class="toggle" id="toggleSound" onclick="settings.toggle('sound')"></div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label"><span>🎵</span> Музыка</div>
+          <div class="toggle" id="toggleMusic" onclick="settings.toggle('music')"></div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label"><span>✨</span> Анимации</div>
+          <div class="toggle active" id="toggleAnim" onclick="settings.toggle('animations')"></div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label"><span>📳</span> Вибрация</div>
+          <div class="toggle" id="toggleVibro" onclick="settings.toggle('vibration')"></div>
+        </div>
+      </div>
+      <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn btn-danger" onclick="ui.confirmDeleteSave()">🗑️ Удалить сохранение</button>
+        <button class="btn btn-secondary" onclick="ui.hideOverlay('settingsOverlay')">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Save -->
+  <div class="overlay" id="confirmDelete">
+    <div class="overlay-content">
+      <div class="overlay-title">🗑️ Удалить сохранение?</div>
+      <div class="overlay-text">Весь прогресс будет безвозвратно удалён. Вы уверены?</div>
+      <div class="overlay-buttons">
+        <button class="btn btn-danger" onclick="game.deleteSave()">Удалить</button>
+        <button class="btn btn-secondary" onclick="ui.hideOverlay('confirmDelete')">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How To Play -->
+  <div class="overlay" id="howToPlay">
+    <div class="overlay-content">
+      <div class="overlay-title">📖 Как играть</div>
+      <div class="howto-section">
+        <h3>🎯 Цель</h3>
+        <p>Управляйте городом 100 дней. Развивайте инфраструктуру, следите за бюджетом и счастьем жителей.</p>
+      </div>
+      <div class="howto-section">
+        <h3>🏗️ Строительство</h3>
+        <p>Нажмите «Строительство», выберите здание, затем свободную клетку на карте. Следите за бюджетом!</p>
+      </div>
+      <div class="howto-section">
+        <h3>⚡ Ресурсы</h3>
+        <p>Электростанции и водные станции обеспечивают город. Нехватка снижает счастье и здоровье.</p>
+      </div>
+      <div class="howto-section">
+        <h3>📅 Дни</h3>
+        <p>Каждый день приносит доходы и расходы. Могут случаться события, требующие ваших решений.</p>
+      </div>
+      <div class="howto-section">
+        <h3>🏆 Рейтинг</h3>
+        <p>После 100 дней вы получите оценку от S до F в зависимости от развития города.</p>
+      </div>
+      <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="ui.hideOverlay('howToPlay')">Понятно</button>
+    </div>
+  </div>
+
+  <!-- Event Overlay -->
+  <div class="overlay" id="eventOverlay">
+    <div class="overlay-content">
+      <div class="event-icon" id="eventIcon">🔥</div>
+      <div class="event-title" id="eventTitle">Событие</div>
+      <div class="event-desc" id="eventDesc">Описание события</div>
+      <div class="overlay-buttons" id="eventButtons"></div>
+    </div>
+  </div>
+
+  <!-- Pause Menu -->
+  <div class="overlay" id="pauseOverlay">
+    <div class="overlay-content">
+      <div class="overlay-title">⏸️ Игра на паузе</div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn btn-primary" onclick="ui.hideOverlay('pauseOverlay')">▶️ Продолжить</button>
+        <button class="btn btn-secondary" onclick="ui.showSettings(); ui.hideOverlay('pauseOverlay')">⚙️ Настройки</button>
+        <button class="btn btn-secondary" onclick="game.saveGame(); ui.hideOverlay('pauseOverlay')">💾 Сохранить</button>
+        <button class="btn btn-secondary" onclick="ui.showMainMenu(); ui.hideOverlay('pauseOverlay')">🏠 Главное меню</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Economy Report -->
+  <div class="overlay" id="economyOverlay">
+    <div class="overlay-content">
+      <div class="overlay-title">📊 Экономический отчёт</div>
+      <div class="economy-report" id="economyReport"></div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="ui.hideOverlay('economyOverlay')">Продолжить</button>
+    </div>
+  </div>
+
+  <!-- End Game -->
+  <div class="overlay" id="endGameOverlay">
+    <div class="overlay-content">
+      <div class="overlay-title">🏆 100 ДНЕЙ ЗАВЕРШЕНЫ</div>
+      <div class="end-rank" id="endRank">S</div>
+      <div style="text-align: center; color: var(--text-muted); margin-bottom: 16px;" id="endRankText">Легендарный мэр</div>
+      <div class="end-stats" id="endStats"></div>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+        <button class="btn btn-primary" onclick="game.startNewGame(); ui.hideOverlay('endGameOverlay')">🔄 Играть снова</button>
+        <button class="btn btn-secondary" onclick="ui.showMainMenu(); ui.hideOverlay('endGameOverlay')">🏠 Главное меню</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exit Message -->
+  <div class="overlay" id="exitOverlay">
+    <div class="overlay-content">
+      <div class="overlay-title">🚪 Выход</div>
+      <div class="overlay-text">Для выхода закройте вкладку браузера или нажмите кнопку «Назад» на устройстве.</div>
+      <button class="btn btn-secondary" style="width: 100%;" onclick="ui.hideOverlay('exitOverlay')">Вернуться в меню</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
